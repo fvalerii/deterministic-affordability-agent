@@ -1,0 +1,32 @@
+# Real secret files
+.env
+.env.local
+.env.*
+!.env.example
+*.key
+
+# Python caches & build artifacts
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Local / temporary artifacts (not part of the source tree)
+log.txt
+code.zip
+output.calibration.csv
+output.holdout.csv
+*:Zone.Identifier
+*.Zone.Identifier

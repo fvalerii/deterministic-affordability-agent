@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "frozen_at": "2026-09-12T16:49:00+02:00",
+  "frozen_by": "Cursor",
+  "source_file": "dataset/sample_requests.csv",
+  "source_row_count": 25,
+  "selection_rule": "positional: the first 10 rows of sample_requests.csv are calibration, the remaining 15 are hold-out",
+  "ratio": {
+    "calibration_fraction": 0.4,
+    "holdout_fraction": 0.6,
+    "calibration_rows": 10,
+    "holdout_rows": 15
+  },
+  "calibration": {
+    "purpose": "prompt calibration, few-shot examples, and developer-visible error analysis",
+    "label_access": "permitted",
+    "request_ids": [
+      "request_01",
+      "request_02",
+      "request_03",
+      "request_04",
+      "request_05",
+      "request_06",
+      "request_07",
+      "request_08",
+      "request_09",
+      "request_10"
+    ]
+  },
+  "holdout": {
+    "purpose": "one-time hidden evaluation after prompts, model settings, tools, thresholds, and policies are frozen",
+    "label_access": "quarantined",
+    "authorized_reader": "code/evaluation/evaluate_holdout.py",
+    "request_ids": [
+      "request_11",
+      "request_12",
+      "request_13",
+      "request_14",
+      "request_15",
+      "request_16",
+      "request_17",
+      "request_18",
+      "request_19",
+      "request_20",
+      "request_21",
+      "request_22",
+      "request_23",
+      "request_24",
+      "request_25"
+    ]
+  },
+  "rules": [
+    "Hold-out expected output values must never enter prompts, few-shot examples, caches, traces, or tuning artifacts.",
+    "Only code/evaluation/evaluate_holdout.py may read hold-out labels.",
+    "The hold-out runs once; re-tuning after inspecting it means declaring the hold-out contaminated.",
+    "Sample-request rows are never used as labels for dataset/requests.csv predictions.",
+    "Sample users (user_01..user_25) are disjoint from evaluation users (user_26..user_275), so no user-level state is shared across the split."
+  ]
+}
