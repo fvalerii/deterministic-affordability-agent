@@ -9,11 +9,15 @@
 ![HackerRank Orchestrate Certificate](./assets/certificate.png)
 *HackerRank Orchestrate Hackathon (September 2026) — Bronze Medal (Ranked 422 / 3,062)*
 
+---
+
 ## Overview
 
 The **Deterministic Affordability Agent** is an AI-powered financial router that evaluates purchase requests and autonomously generates personalized payment schedules (full payment, installments, partial payments, or wait). 
 
 To solve the critical enterprise risk of LLM financial hallucination, this system utilizes a **hybrid deterministic-plus-LLM architecture**. The language model is strictly prohibited from inventing money, choosing dates, or calculating schedules. Instead, all mathematical ledger operations, 90-day cash flow forecasts, and state routing are executed securely in a deterministic Python kernel.
+
+---
 
 ## Architectural Approach
 
@@ -22,6 +26,8 @@ To solve the critical enterprise risk of LLM financial hallucination, this syste
 2. **NLP Explanation:** Rewriting an already-validated, Python-generated payment plan into a human-readable `decision_explanation` citing the user's financial priorities.
 
 Everything that impacts the user's cash state—balances, FX conversions, recurring transaction detection, spending cuts, and payment scheduling—is computed in Python using strict `Decimal` arithmetic. Forced tool-calling and a post-generation number-lock check guarantee that the LLM cannot introduce a date or figure that is not already mathematically proven by the deterministic plan.
+
+---
 
 ## Pipeline Flow
 
@@ -41,6 +47,8 @@ output.csv  ←  explanation (Claude)  ←  rank  ←  validate
 8. **Explanation.** Claude Sonnet 4.6 writes `decision_explanation` from the frozen plan. Failures fall back to a deterministic sentence that still cites priorities and copies plan values.
 9. **Write** one `output.csv` row per evaluation request, then `evaluation/usage_report.md` for the same run.
 
+---
+
 ## Setup
 
 Python 3.11+ is sufficient. From the repository root (the directory that contains `dataset/` and `code/`):
@@ -58,6 +66,8 @@ Set `ANTHROPIC_API_KEY` in `.env`. The key is read entirely at runtime and is ne
 ANTHROPIC_VISION_MODEL=claude-sonnet-4-6
 ANTHROPIC_EXPLANATION_MODEL=claude-sonnet-4-6
 ```
+
+---
 
 ## Execution
 
@@ -79,6 +89,8 @@ python3 code/main.py --split holdout       # request_11..25 (no labels used)
 python3 code/main.py --limit 5             # debug; does not overwrite the submission usage report
 ```
 
+---
+
 ## Output contract
 
 `output.csv` columns, in this order:
@@ -92,6 +104,8 @@ request_id,amount_safe_to_pay,affordability_status,recommended_payment_method,pa
 - `recommended_payment_method`: `full_payment` | `partial_payment` | `installments` | `wait` | `not_recommended`
 - `payment_plan`: chronological `YYYY-MM-DD:amount` entries joined by `|`, or `none`
 - `spending_changes_needed`: up to three `stop:<event_id>` / `reduce_to:<event_id>:<amount>` actions on flexible, non-protected events, or `none`
+
+---
 
 ## Layout
 
@@ -112,9 +126,13 @@ request_id,amount_safe_to_pay,affordability_status,recommended_payment_method,pa
 └── output.csv                # Pipeline predictions
 ```
 
+---
+
 ## Token usage
 
 The full evaluation run that produced `output.csv` is summarized in `evaluation/usage_report.md` (also at `code/evaluation/usage_report.md`). It reports provider, model name, call counts, input/output/total tokens, averages per request, and estimated USD cost. Money math is not billed as tokens.
+
+---
 
 ## Design constraints honored
 
@@ -124,3 +142,8 @@ The full evaluation run that produced `output.csv` is summarized in `evaluation/
 - No organizer-only files and no hardcoded evaluation labels
 - Deterministic kernel; LLM output is constrained and verified
 - Secrets from environment variables only
+
+---
+
+## License
+This project is licensed under the MIT License.
