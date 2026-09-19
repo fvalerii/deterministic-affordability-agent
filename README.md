@@ -1,21 +1,29 @@
-# Buy or Wait?
+# Deterministic Affordability Agent 
+**Hybrid LLM Financial Pipeline with Zero Hallucination**
 
-An AI-powered affordability agent for the HackerRank Orchestrate challenge (September 2026). For every purchase or payment request it decides whether to pay in full, pay in two parts, use a seller installment option, wait, or not proceed — without letting the language model invent money.
+![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg?style=flat-square&logo=python&logoColor=white)
+![Claude 4.6 Sonnet](https://img.shields.io/badge/Claude%204.6%20Sonnet-Anthropic-8A2BE2?style=flat-square)
+![Pydantic](https://img.shields.io/badge/Pydantic-Data%20Validation-e92063?style=flat-square)
+![HackerRank](https://img.shields.io/badge/HackerRank-Bronze%20Medal-CD7F32?style=flat-square&logo=hackerrank&logoColor=white)
 
-## Approach
+![HackerRank Orchestrate Certificate](./assets/certificate.png)
+*HackerRank Orchestrate Hackathon (September 2026) — Bronze Medal (Ranked 422 / 3,062)*
 
-This is a **hybrid deterministic-plus-LLM pipeline**.
+## Overview
 
-**Claude Sonnet 4.6** (`claude-sonnet-4-6`, Anthropic) is used for two tasks only:
+The **Deterministic Affordability Agent** is an AI-powered financial router that evaluates purchase requests and autonomously generates personalized payment schedules (full payment, installments, partial payments, or wait). 
 
-1. **Vision** — extract a positive payable amount from a linked receipt or statement when `financial_events.csv` leaves `amount` blank. A blank amount is never treated as zero.
-2. **Explanation** — rewrite an already-validated plan into a short `decision_explanation` that cites the user's `financial_priorities`.
+To solve the critical enterprise risk of LLM financial hallucination, this system utilizes a **hybrid deterministic-plus-LLM architecture**. The language model is strictly prohibited from inventing money, choosing dates, or calculating schedules. Instead, all mathematical ledger operations, 90-day cash flow forecasts, and state routing are executed securely in a deterministic Python kernel.
 
-Everything that affects cash — balances, FX, recurrence, forecasts, payment schedules, spending cuts, and the recommended method — is computed in Python with `Decimal` arithmetic. The model never chooses an amount, a date, a payment method, or a spending change. Forced tool-calling plus a number-lock check reject any explanation that introduces a date or figure that is not already on the plan.
+## Architectural Approach
 
-Messages and images are treated as untrusted evidence. They may confirm, amend, delay, or cancel a fact, but embedded instructions (including advance-fee bait) never override the challenge rules.
+**Claude Sonnet 4.6** is strictly constrained to two specific tasks:
+1. **Multimodal Vision Extraction:** Extracting payable amounts from linked receipt/statement images when ledger data is missing.
+2. **NLP Explanation:** Rewriting an already-validated, Python-generated payment plan into a human-readable `decision_explanation` citing the user's financial priorities.
 
-## Pipeline
+Everything that impacts the user's cash state—balances, FX conversions, recurring transaction detection, spending cuts, and payment scheduling—is computed in Python using strict `Decimal` arithmetic. Forced tool-calling and a post-generation number-lock check guarantee that the LLM cannot introduce a date or figure that is not already mathematically proven by the deterministic plan.
+
+## Pipeline Flow
 
 ```text
 dataset/  →  evidence  →  ledger  →  forecast  →  candidates
@@ -44,14 +52,12 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-Set `ANTHROPIC_API_KEY` in `.env` or in the environment. The key is read at runtime and is never written to `output.csv`, logs, or `evaluation/usage_report.md`. Optional overrides:
+Set `ANTHROPIC_API_KEY` in `.env`. The key is read entirely at runtime and is never exposed to output files or logs. If the key is unset, the agent gracefully degrades to offline vision fallbacks and deterministic explanations. Optional overrides:
 
 ```text
 ANTHROPIC_VISION_MODEL=claude-sonnet-4-6
 ANTHROPIC_EXPLANATION_MODEL=claude-sonnet-4-6
 ```
-
-If the key is unset, the agent still produces a valid `output.csv` using offline vision fallbacks and deterministic explanations. The submitted `output.csv` was generated with Claude Sonnet 4.6 enabled.
 
 ## Execution
 
@@ -59,7 +65,7 @@ If the key is unset, the agent still produces a valid `output.csv` using offline
 python3 code/main.py
 ```
 
-That command:
+This command:
 
 - reads every row in `dataset/requests.csv`
 - writes `output.csv` at the repository root (exact columns, one row per `request_id`)
@@ -91,17 +97,17 @@ request_id,amount_safe_to_pay,affordability_status,recommended_payment_method,pa
 
 ```text
 .
-├── README.md                 # this file
-├── requirements.txt
-├── .env.example              # placeholder only; never commit a real key
+├── README.md                 # This file
+├── requirements.txt          # Dependencies
+├── .env.example              # Placeholder only; never commit a real key
 ├── code/
-│   ├── main.py               # entry point
-│   ├── domain.py             # frozen Pydantic models and money formatting
-│   ├── tools/                # ledger, forecast, planning, validation, LLM adapters
+│   ├── main.py               # Pipeline orchestrator
+│   ├── domain.py             # Frozen Pydantic models and decimal formatting
+│   ├── tools/                # Ledger, forecast, planning, validation logic
 │   └── evaluation/
-│       └── usage_report.md   # token/cost report for the 250-row run
-├── dataset/                  # provided inputs (not modified)
-└── output.csv                # 250 predictions
+│       └── usage_report.md   # Automated token and USD cost tracking
+├── dataset/                  # Structured inputs and media files
+└── output.csv                # Pipeline predictions
 ```
 
 ## Token usage
