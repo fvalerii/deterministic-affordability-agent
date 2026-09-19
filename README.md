@@ -106,6 +106,8 @@ request_id,amount_safe_to_pay,affordability_status,recommended_payment_method,pa
 │   ├── tools/                # Ledger, forecast, planning, validation logic
 │   └── evaluation/
 │       └── usage_report.md   # Automated token and USD cost tracking
+│       └── full_audit.py     # Statistical & numerical audit suite
+│       └── calibrate.py      # Calibration pipeline for threshold tuning
 ├── dataset/                  # Structured inputs and media files
 └── output.csv                # Pipeline predictions
 ```
